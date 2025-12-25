@@ -25,7 +25,7 @@ public class users {
     * Entity marks this class as an entity class
     * Table(name = users) -> name of table
     * (schema = security) -> name of the schema ( in postgre, DATABASE -> SCHEMA -> Tables whereas in mysql, DATABASE = SCHEMA)
-    * Id annotation -> marks the primary key
+    * ID annotation -> marks the primary key
     * GeneratedValue annotation -> marks the auto increment strategy ( tells spring to let postgres's IDENTITY auto increment feature handle id generation)
     * GeneratedValue annotaion ensures that spring/hibernate do not change value 
     */ 
@@ -55,7 +55,6 @@ public class users {
     * Columns for external auth users ( google + 0auth2.0)
     * 
     * */
-    @
     @Column(name = "provider", nullable = false)
     private Enum provider;
 
