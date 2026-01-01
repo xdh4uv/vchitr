@@ -15,7 +15,7 @@ RUN mvn clean package -DskipTests
 # ===============================
 # Runtime stage
 # ===============================
-FROM eclipse-temurin:25-jre-apline
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 
 # Copy the built JAR
