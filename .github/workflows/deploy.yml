@@ -1,3 +1,10 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
 env:
   PROJECT_ID: project-09f75442-f87f-4b29-968
   PROJECT_NUMBER: 360198964714
@@ -5,3 +12,42 @@ env:
   REGION: asia-south1
   WORKLOAD_IDENTITY_PROVIDER: projects/360198964714/locations/global/workloadIdentityPools/github-pool/providers/github-provider
   SERVICE_ACCOUNT: github-actions@project-09f75442-f87f-4b29-968.iam.gserviceaccount.com
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/360198964714/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions@project-09f75442-f87f-4b29-968.iam.gserviceaccount.com'
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      
+      - name: Configure Docker to use gcloud as credential helper
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+      
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+      
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --set-env-vars "SPRING_PROFILES_ACTIVE=dev,SPRING_DATASOURCE_URL=${{ secrets.DB_URL }},SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }},SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}"nv:
+
