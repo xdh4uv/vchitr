@@ -1,0 +1,7 @@
+env:
+  PROJECT_ID: project-09f75442-f87f-4b29-968
+  PROJECT_NUMBER: 360198964714
+  SERVICE_NAME: vchitr
+  REGION: asia-south1
+  WORKLOAD_IDENTITY_PROVIDER: projects/360198964714/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+  SERVICE_ACCOUNT: github-actions@project-09f75442-f87f-4b29-968.iam.gserviceaccount.com
